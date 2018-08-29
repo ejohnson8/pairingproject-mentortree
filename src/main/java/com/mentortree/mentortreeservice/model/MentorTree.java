@@ -1,31 +1,31 @@
 package com.mentortree.mentortreeservice.model;
 
 public class MentorTree {
-    private Employee employee;
-    private Mentor mentor;
-    private TreeLead treeLead;
+    private String employee_id;
+    private String mentor_id;
+    private String treeLead_id;
 
-    public Employee getEmployee() {
-        return employee;
+    public String getEmployee_id() {
+        return employee_id;
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setEmployee_id(String employee_id) {
+        this.employee_id = employee_id;
     }
 
-    public Mentor getMentor() {
-        return mentor;
+    public String getMentor_id() {
+        return mentor_id;
     }
 
-    public void setMentor(Mentor mentor) {
-        this.mentor = mentor;
+    public void setMentor_id(String mentor_id) {
+        this.mentor_id = mentor_id;
     }
 
-    public TreeLead getTreeLead() {
-        return treeLead;
+    public String getTreeLead_id() {
+        return treeLead_id;
     }
 
-    public void setTreeLead(TreeLead treeLead) {
-        this.treeLead = treeLead;
+    public void setTreeLead_id(String treeLead_id) {
+        this.treeLead_id = treeLead_id;
     }
 }

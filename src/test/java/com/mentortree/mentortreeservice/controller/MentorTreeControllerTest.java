@@ -1,25 +1,21 @@
 package com.mentortree.mentortreeservice.controller;
 
 import com.mentortree.mentortreeservice.database.EmployeeJdbcRepository;
-import com.mentortree.mentortreeservice.model.Employee;
-import com.mentortree.mentortreeservice.model.Mentor;
-import com.mentortree.mentortreeservice.model.TreeLead;
-import com.mentortree.mentortreeservice.model.employeeservice.EmployeeServiceObject;
+import com.mentortree.mentortreeservice.model.MentorTree;
 import com.mentortree.mentortreeservice.model.response.EmployeeResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MentorTreeControllerTest {
@@ -28,7 +24,7 @@ public class MentorTreeControllerTest {
     private EmployeeJdbcRepository mockRepository;
     private RestTemplate mockRestTemplate;
 
-    private List<EmployeeServiceObject> employees = new ArrayList<EmployeeServiceObject>();
+    private List<Map<String, String>> employees = new ArrayList<Map<String, String>>();
 
     @Before
     public void setUp() {
@@ -40,23 +36,24 @@ public class MentorTreeControllerTest {
         ReflectionTestUtils.setField(mentorTreeController, "repository", mockRepository);
         ReflectionTestUtils.setField(mentorTreeController, "restTemplate", mockRestTemplate);
 
-        EmployeeServiceObject employee = new EmployeeServiceObject();
-        employee.setFirstName("liz");
-        employee.setLastName("johnson");
-        employee.setEmployeeID("123");
-        employee.setImageURL("www.image.com");
+        Map<String, String> employee = new HashMap<String, String>();
+        employee.put("firstName", "liz");
+        employee.put("lastName", "johnson");
+        employee.put("employeeID", "123");
+        employee.put("imageURL", "www.image.com");
 
         employees.add(employee);
     }
 
     @Test
     public void testGetEmployeesByMentorId() {
-        Mentor mentor = new Mentor();
-        mentor.setId("321");
-        mentor.setMentees(new ArrayList<String>(Arrays.asList("123")));
+        List<MentorTree> mentorTree = new ArrayList<MentorTree>();
+        MentorTree entry = new MentorTree();
+        entry.setEmployee_id("123");
+        entry.setMentor_id("321");
+        mentorTree.add(entry);
 
-
-        when(mockRepository.getById("321")).thenReturn(mentor);
+        when(mockRepository.getByMentorId("321")).thenReturn(mentorTree);
         when(mockRestTemplate.getForObject(anyString(), anyObject())).thenReturn(employees);
 
 
@@ -75,24 +72,24 @@ public class MentorTreeControllerTest {
 
     @Test
     public void testGetEmployeesByTreeLeadId(){
-        EmployeeServiceObject mentorEmployee = new EmployeeServiceObject();
-        mentorEmployee.setFirstName("Thanh");
-        mentorEmployee.setLastName("Tran");
-        mentorEmployee.setEmployeeID("2");
-        mentorEmployee.setImageURL("www.Thanh-image.com");
+        Map<String, String> mentorEmployee = new HashMap<String, String>();
+        mentorEmployee.put("firstName", "Thanh");
+        mentorEmployee.put("lastName", "Tran");
+        mentorEmployee.put("employeeID", "2");
+        mentorEmployee.put("imageURL", "www.Thanh-image.com");
 
         employees.add(mentorEmployee);
 
-        TreeLead treeLead = new TreeLead();
-        treeLead.setId("1");
-        treeLead.setMentors(new ArrayList<String>(Arrays.asList("2")));
+        List<MentorTree> mentorTree = new ArrayList<MentorTree>();
+        MentorTree entry = new MentorTree();
+        entry.setEmployee_id("123");
+        entry.setMentor_id("2");
+        entry.setTreeLead_id("1");
+        mentorTree.add(entry);
 
-        Mentor mentor = new Mentor();
-        mentor.setId("2");
-        mentor.setMentees(new ArrayList<String>(Arrays.asList("3")));
 
-        when(mockRepository.getById("1")).thenReturn(treeLead);
-        when(mockRepository.getById("2")).thenReturn(mentor);
+        when(mockRepository.getByTreeLeadId("1")).thenReturn(mentorTree);
+
         when(mockRestTemplate.getForObject(anyString(), anyObject())).thenReturn(employees);
 
         List<EmployeeResponse> employees = mentorTreeController.getEmployeesByTreeLeadId("1");
@@ -115,5 +112,40 @@ public class MentorTreeControllerTest {
         Assert.assertEquals("www.Thanh-image.com", employees.get(1).getImageURL());
 
 
+    }
+
+    @Test
+    public void testUpdateMentor(){
+
+        List<String> mentees = new ArrayList<String>(Arrays.asList("123"));
+        when(mockRepository.updateMentor("4", mentees)).thenReturn(true);
+
+        Assert.assertEquals(HttpStatus.OK,mentorTreeController.updateMentor("4",mentees));
+        verify(mockRepository).updateMentor("4", mentees);
+
+    }
+
+    @Test
+    public void testDeleteMentee() {
+        when(mockRepository.deleteEmployee("employee", "4")).thenReturn(true);
+
+        Assert.assertEquals(HttpStatus.OK,mentorTreeController.deleteEmployee("employee", "4"));
+        verify(mockRepository).deleteEmployee("employee", "4");
+    }
+
+    @Test
+    public void testDeleteMentor() {
+        when(mockRepository.deleteEmployee("mentor", "4")).thenReturn(true);
+
+        Assert.assertEquals(HttpStatus.OK,mentorTreeController.deleteEmployee("mentor", "4"));
+        verify(mockRepository).deleteEmployee("mentor", "4");
+    }
+
+    @Test
+    public void testDeleteTreeLead() {
+        when(mockRepository.deleteEmployee("treeLead", "4")).thenReturn(true);
+
+        Assert.assertEquals(HttpStatus.OK,mentorTreeController.deleteEmployee("treeLead", "4"));
+        verify(mockRepository).deleteEmployee("treeLead", "4");
     }
 }
