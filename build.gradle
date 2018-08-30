@@ -28,6 +28,7 @@ repositories {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-jdbc')
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '2.0.1.RELEASE'
     compile('com.h2database:h2')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

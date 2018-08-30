@@ -2,8 +2,9 @@ package com.mentortree.mentortreeservice.controller;
 
 import com.mentortree.mentortreeservice.database.EmployeeJdbcRepository;
 import com.mentortree.mentortreeservice.model.MentorTree;
-import com.mentortree.mentortreeservice.model.employeeservice.EmployeeServiceObject;
 import com.mentortree.mentortreeservice.model.response.EmployeeResponse;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,12 @@ public class MentorTreeController {
     @Autowired
     private RestTemplate restTemplate;
 
+    private final EurekaClient discoveryClient;
+
+    public MentorTreeController(EurekaClient discoveryClient) {
+        this.discoveryClient = discoveryClient;
+    }
+
     @RequestMapping(value = "/mentor/{id}", method = RequestMethod.GET)
     @ResponseBody
     public List<EmployeeResponse> getEmployeesByMentorId(@PathVariable("id") String id) {
@@ -31,7 +38,7 @@ public class MentorTreeController {
 
         List<String> employeeIds = getEmployeeIdsFromMentorTrees(mentees);
         String idList = StringUtils.join(employeeIds, ',');
-        List<HashMap<String, String>> employees = restTemplate.getForObject("http://localhost:8080/employee/getAll/"+ idList, List.class);
+        List<HashMap<String, String>> employees = restTemplate.getForObject(fetchEmployeeServiceUrl()+"/employee"+"/employee/getAll/"+ idList, List.class);
 
         return mapToResponseObject(employees);
 
@@ -46,7 +53,7 @@ public class MentorTreeController {
         employeeIds.addAll(getEmployeeIdsFromMentorTrees(ids));
         employeeIds.addAll(getMentorIdsFromMentorTrees(ids));
         String idList = StringUtils.join(employeeIds, ',');
-        List<HashMap<String, String>> employees = restTemplate.getForObject("localhost:8080/employee/getAll/"+ idList, List.class);
+        List<HashMap<String, String>> employees = restTemplate.getForObject(fetchEmployeeServiceUrl() +"/employee"+ "/employee/getAll/"+ idList, List.class);
 
         return mapToResponseObject(employees);
 
@@ -97,5 +104,10 @@ public class MentorTreeController {
         return mentors;
     }
 
+    private String fetchEmployeeServiceUrl() {
+        InstanceInfo instance = discoveryClient.getNextServerFromEureka("GATEWAY-APPLICATION", false);
+        String employeeServiceUrl = instance.getHomePageUrl();
+        return employeeServiceUrl;
+    }
 
 }
