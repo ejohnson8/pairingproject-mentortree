@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.cloud.netflix.eureka.CloudEurekaClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -35,122 +36,15 @@ public class MentorTreeControllerTest {
     MentorTreeController mentorTreeController;
     private EmployeeJdbcRepository mockRepository;
     private RestTemplate mockRestTemplate;
+    private EurekaClient mockDiscoveryClient;
 
     private List<Map<String, String>> employees = new ArrayList<Map<String, String>>();
 
     @Before
     public void setUp() {
-        mentorTreeController = new MentorTreeController(new EurekaClient() {
-            @Override
-            public Applications getApplicationsForARegion(String region) {
-                return null;
-            }
+        mockDiscoveryClient = mock(EurekaClient.class);
 
-            @Override
-            public Applications getApplications(String serviceUrl) {
-                return null;
-            }
-
-            @Override
-            public List<InstanceInfo> getInstancesByVipAddress(String vipAddress, boolean secure) {
-                return null;
-            }
-
-            @Override
-            public List<InstanceInfo> getInstancesByVipAddress(String vipAddress, boolean secure, String region) {
-                return null;
-            }
-
-            @Override
-            public List<InstanceInfo> getInstancesByVipAddressAndAppName(String vipAddress, String appName, boolean secure) {
-                return null;
-            }
-
-            @Override
-            public Set<String> getAllKnownRegions() {
-                return null;
-            }
-
-            @Override
-            public InstanceInfo.InstanceStatus getInstanceRemoteStatus() {
-                return null;
-            }
-
-            @Override
-            public List<String> getDiscoveryServiceUrls(String zone) {
-                return null;
-            }
-
-            @Override
-            public List<String> getServiceUrlsFromConfig(String instanceZone, boolean preferSameZone) {
-                return null;
-            }
-
-            @Override
-            public List<String> getServiceUrlsFromDNS(String instanceZone, boolean preferSameZone) {
-                return null;
-            }
-
-            @Override
-            public void registerHealthCheckCallback(HealthCheckCallback callback) {
-
-            }
-
-            @Override
-            public void registerHealthCheck(HealthCheckHandler healthCheckHandler) {
-
-            }
-
-            @Override
-            public void registerEventListener(EurekaEventListener eventListener) {
-
-            }
-
-            @Override
-            public boolean unregisterEventListener(EurekaEventListener eventListener) {
-                return false;
-            }
-
-            @Override
-            public HealthCheckHandler getHealthCheckHandler() {
-                return null;
-            }
-
-            @Override
-            public void shutdown() {
-
-            }
-
-            @Override
-            public EurekaClientConfig getEurekaClientConfig() {
-                return null;
-            }
-
-            @Override
-            public ApplicationInfoManager getApplicationInfoManager() {
-                return null;
-            }
-
-            @Override
-            public Application getApplication(String appName) {
-                return null;
-            }
-
-            @Override
-            public Applications getApplications() {
-                return null;
-            }
-
-            @Override
-            public List<InstanceInfo> getInstancesById(String id) {
-                return null;
-            }
-
-            @Override
-            public InstanceInfo getNextServerFromEureka(String virtualHostname, boolean secure) {
-                return null;
-            }
-        });
+        mentorTreeController = new MentorTreeController(mockDiscoveryClient);
 
         mockRepository = mock(EmployeeJdbcRepository.class);
         mockRestTemplate = mock(RestTemplate.class);
