@@ -26,9 +26,14 @@ repositories {
 
 
 dependencies {
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-data-rest')
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-jdbc')
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '2.0.1.RELEASE'
-    compile('com.h2database:h2')
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '2.0.1.RELEASE'
+    compile group: 'io.pivotal.spring.cloud', name: 'spring-cloud-services-starter-service-registry', version: '2.0.1.RELEASE'
+    compile group: 'com.h2database', name: 'h2', version: '1.4.197'
+    runtime group: 'com.h2database', name: 'h2', version: '1.4.197'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
