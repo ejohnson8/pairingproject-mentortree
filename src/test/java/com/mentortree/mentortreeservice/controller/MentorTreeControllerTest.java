@@ -3,21 +3,12 @@ package com.mentortree.mentortreeservice.controller;
 import com.mentortree.mentortreeservice.database.EmployeeJdbcRepository;
 import com.mentortree.mentortreeservice.model.MentorTree;
 import com.mentortree.mentortreeservice.model.response.EmployeeResponse;
-import com.netflix.appinfo.ApplicationInfoManager;
-import com.netflix.appinfo.HealthCheckCallback;
-import com.netflix.appinfo.HealthCheckHandler;
 import com.netflix.appinfo.InstanceInfo;
-import com.netflix.discovery.DiscoveryClient;
 import com.netflix.discovery.EurekaClient;
-import com.netflix.discovery.EurekaClientConfig;
-import com.netflix.discovery.EurekaEventListener;
-import com.netflix.discovery.shared.Application;
-import com.netflix.discovery.shared.Applications;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.cloud.netflix.eureka.CloudEurekaClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -49,6 +40,7 @@ public class MentorTreeControllerTest {
         mockRepository = mock(EmployeeJdbcRepository.class);
         mockRestTemplate = mock(RestTemplate.class);
 
+
         ReflectionTestUtils.setField(mentorTreeController, "repository", mockRepository);
         ReflectionTestUtils.setField(mentorTreeController, "restTemplate", mockRestTemplate);
 
@@ -69,9 +61,12 @@ public class MentorTreeControllerTest {
         entry.setMentor_id("321");
         mentorTree.add(entry);
 
+        InstanceInfo instanceInfo = mock(InstanceInfo.class);
+
+        when(instanceInfo.getHomePageUrl()).thenReturn("home page url");
         when(mockRepository.getByMentorId("321")).thenReturn(mentorTree);
         when(mockRestTemplate.getForObject(anyString(), anyObject())).thenReturn(employees);
-
+        when(mockDiscoveryClient.getNextServerFromEureka("GATEWAY-APPLICATION", false)).thenReturn(instanceInfo);
 
         List<EmployeeResponse> employees = mentorTreeController.getEmployeesByMentorId("321");
 
@@ -103,10 +98,12 @@ public class MentorTreeControllerTest {
         entry.setTreeLead_id("1");
         mentorTree.add(entry);
 
+        InstanceInfo instanceInfo = mock(InstanceInfo.class);
 
+        when(instanceInfo.getHomePageUrl()).thenReturn("home page url");
         when(mockRepository.getByTreeLeadId("1")).thenReturn(mentorTree);
-
         when(mockRestTemplate.getForObject(anyString(), anyObject())).thenReturn(employees);
+        when(mockDiscoveryClient.getNextServerFromEureka("GATEWAY-APPLICATION", false)).thenReturn(instanceInfo);
 
         List<EmployeeResponse> employees = mentorTreeController.getEmployeesByTreeLeadId("1");
 
